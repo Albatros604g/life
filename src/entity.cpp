@@ -7,6 +7,9 @@
 #include <valarray>
 #include <iostream>
 #include "entity.h"
+#include <string>
+#include <random>
+#include <SFML/Window/Mouse.hpp>
 
 //! \brief Constructeur de la classe entity
 entity::entity() {
@@ -21,6 +24,8 @@ entity::entity() {
     m_FieldOfView.setFillColor(sf::Color(255, 255, 255, 128));
 
     setPositionFieldView();
+    initADN();
+    initAttributes();
 }
 
 //! \brief Destructeur de la classe entity
@@ -85,4 +90,76 @@ void entity::setPositionFieldView() {
 
     // colle le point de vue au centre de l'entité
     m_FieldOfView.setPosition(pos);
+}
+
+//! \brief Initialise l'ADN de l'entité
+void entity::initADN() {
+    m_ADN = "";
+    std::string pattern = "ACGT"; // patron
+    // A = Adénine
+    // C = Cytosine
+    // G = Guanine
+    // T = Thymine
+    // ses 4 lettres sont les bases de l'ADN et sont les seules à être utilisées
+    int patternLength = pattern.length();
+    std::random_device rd; // initialisation du générateur aléatoire
+    std::mt19937 gen(rd()); // initialisation du générateur aléatoire
+    std::uniform_int_distribution<> dis(0, patternLength - 1); // distribution uniforme sur l'intervalle [0, patternLength - 1]
+    int length = 100; // longueur de la séquence
+    for (int i = 0; i < length; i++) {
+        m_ADN += pattern[dis(gen)]; // ajouter un caractère aléatoire du patron
+    }
+}
+
+void entity::initAttributes() {
+    // détermine les attributs de l'entité en fonction de son ADN
+    m_LifeMax = 100;
+    m_EnergyMax = 100;
+    m_Speed = 1;
+    m_SpeedMax = 10;
+
+    for (int i = 0; i < m_ADN.length(); i++) {
+        // Utilisez la valeur de l'ADN pour calculer la valeur de chaque attribut
+        if (m_ADN[i] == 'A') {
+            m_LifeMax += 1;
+        } else if (m_ADN[i] == 'C') {
+            m_EnergyMax += 1;
+        } else if (m_ADN[i] == 'G') {
+            m_SpeedMax += 1;
+        } else if (m_ADN[i] == 'T') {
+            m_EnergyMax += 1;
+        }
+    }
+
+    m_Life = m_LifeMax;
+    m_Energy = m_EnergyMax;
+}
+
+bool entity::checkPositionIsInside(int x, int y) {
+    // calcule la position du centre de l'entité
+    int x_centre = m_Circle.getPosition().x + m_Circle.getRadius();
+    int y_centre = m_Circle.getPosition().y + m_Circle.getRadius();
+    int rayon = m_Circle.getRadius();
+
+    int distance = sqrt(pow(x - x_centre, 2) + pow(y - y_centre, 2));
+    if (distance <= rayon)
+        return true;
+    else
+        return false;
+}
+
+std::string entity::getADN() {
+    return m_ADN;
+}
+
+int entity::getLife() {
+    return m_Life;
+}
+
+int entity::getEnergy() {
+    return m_Energy;
+}
+
+int entity::getSpeed() {
+    return m_Speed;
 }

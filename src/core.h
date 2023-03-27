@@ -36,6 +36,10 @@ private:
 
     // Liste des entités amicales
     std::list<friendly> m_FriendlyEntities;
+
+    // entité sélectionnée
+    entity *m_SelectedEntity;
+    bool m_IsEntitySelected;
 };
 
 

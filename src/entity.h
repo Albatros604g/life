@@ -11,6 +11,7 @@
 #include <SFML/System/Vector3.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
 
+
 class entity {
 public:
     entity();
@@ -22,6 +23,13 @@ public:
     void update(sf::Time elapsed);
     void render(sf::RenderWindow &window);
 
+    bool checkPositionIsInside(int x, int y);
+
+    std::string getADN();
+    int getLife();
+    int getEnergy();
+    int getSpeed();
+
     sf::CircleShape getCircle();
 
 protected:
@@ -32,7 +40,20 @@ protected:
     void move(int x, int y);
 
     void setPositionFieldView();
+
 private:
+    void initADN();
+    void initAttributes();
+    std::string m_ADN;
+    int m_Life;
+    int m_LifeMax;
+    int m_Energy;
+    int m_EnergyMax;
+    int m_Speed;
+    int m_SpeedMax;
+
+    sf::Time m_TimeBeforeDeath;
+    sf::Time m_TimeBeforeReproduction;
 
 
 };

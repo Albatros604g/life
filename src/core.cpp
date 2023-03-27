@@ -3,20 +3,19 @@
 //
 
 #include <cmath>
+#include <iostream>
 #include "core.h"
 
 core::core() {
     initWindow();
 
-    m_Friendly = friendly();
-    m_Hostil = hostil();
     m_Friendly.setPos(0, 0);
     m_Hostil.setPos(200, 200);
     // Ajoute les entités à la liste
     m_HostilesEntities.push_back(m_Hostil);
     m_FriendlyEntities.push_back(m_Friendly);
 
-
+    m_IsEntitySelected = false;
 }
 
 core::~core() {
@@ -39,7 +38,8 @@ void core::initWindow() {
     // récurer la taille de l'écran
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
-    m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Titlebar);
+    //m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Titlebar);
+    m_Window.create(sf::VideoMode( 800, 600), "Life", sf::Style::Close | sf::Style::Titlebar);
 
     m_Window.setFramerateLimit(60);
     m_View = m_Window.getDefaultView();
@@ -76,6 +76,42 @@ void core::pollEvents() {
                 m_Window.setView(m_View);
             }
         }
+
+        if (event.type == sf::Event::MouseWheelScrolled) {
+            // zoom la vue si la molette de la souris est utilisée
+            if (event.mouseWheelScroll.delta > 0) {
+                m_View.zoom(0.9);
+                m_Window.setView(m_View);
+            } else {
+                m_View.zoom(1.1);
+                m_Window.setView(m_View);
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            // test si on clique sur le bouton gauche de la souris
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                // converti les coordonnées de la souris en coordonnées de la vue
+                sf::Vector2f mousePos = m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
+
+                m_IsEntitySelected = false;
+                // test si on clique sur une entité amicale
+                for (auto &entity : m_FriendlyEntities) {
+                    if (entity.checkPositionIsInside(mousePos.x, mousePos.y)) {
+                        std::cout << "click on friendly" << std::endl;
+                        m_SelectedEntity = &entity;
+                        m_IsEntitySelected = true;
+                    }
+                }
+                for (auto &entity : m_HostilesEntities) {
+                    if (entity.checkPositionIsInside(mousePos.x, mousePos.y)) {
+                        std::cout << "click on hostil" << std::endl;
+                        m_SelectedEntity = &entity;
+                        m_IsEntitySelected = true;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -89,6 +125,14 @@ void core::update(sf::Time elapsed) {
     // parcours la liste des entités amicales
     for (auto &entity : m_FriendlyEntities) {
         entity.update(elapsed);
+    }
+
+    if (m_IsEntitySelected) {
+        std::string adn = m_SelectedEntity->getADN();
+        int life = m_SelectedEntity->getLife();
+        int energy = m_SelectedEntity->getEnergy();
+        int speed = m_SelectedEntity->getSpeed();
+        std::cout << "ADN: " << adn << " life: " << life << " energy: " << energy << " speed: " << speed << std::endl;
     }
 
 /*
@@ -126,4 +170,5 @@ void core::render() {
     for (auto &entity : m_HostilesEntities) {
         entity.render(m_Window);
     }
+
 }

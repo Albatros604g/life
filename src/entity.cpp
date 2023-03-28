@@ -15,13 +15,17 @@
 entity::entity() {
     m_Circle.setRadius(10);
     m_Circle.setFillColor(sf::Color::White);
-
+    m_Circle.setOrigin(m_Circle.getRadius(), m_Circle.getRadius());
+    // rotate field of view en fonction de l'angle de l'entité
+    m_FieldOfView.setOrigin(m_Circle.getRadius(), m_Circle.getRadius());
 
     m_FieldOfView.setPointCount(3);
     m_FieldOfView.setPoint(0, sf::Vector2f((m_Circle.getRadius()), (m_Circle.getRadius())));
     m_FieldOfView.setPoint(1, sf::Vector2f((m_Circle.getRadius()) + 50, (m_Circle.getRadius()) - 100));
     m_FieldOfView.setPoint(2, sf::Vector2f((m_Circle.getRadius()) - 50, (m_Circle.getRadius()) - 100));
     m_FieldOfView.setFillColor(sf::Color(255, 255, 255, 128));
+
+    isSelected(false);
 
     setPositionFieldView();
     initADN();
@@ -41,10 +45,6 @@ sf::CircleShape entity::getCircle() {
 //! \brief Défini la position de l'entité
 void entity::setPos(sf::Vector2f position) {
     m_Circle.setPosition(position);
-
-    // calcule la position
-    sf::Vector2f pos = m_Circle.getPosition();
-
     setPositionFieldView();
 }
 
@@ -56,12 +56,7 @@ void entity::setPos(float x, float y) {
 
 //! \brief Tourne l'entité
 void entity::rotate(int angle) {
-    m_Circle.setOrigin(m_Circle.getRadius(), m_Circle.getRadius());
     m_Circle.rotate(angle);
-
-    // rotate field of view en fonction de l'angle de l'entité
-
-    m_FieldOfView.setOrigin(m_Circle.getRadius(), m_Circle.getRadius());
     m_FieldOfView.rotate(angle);
 
 }
@@ -81,6 +76,16 @@ void entity::update(sf::Time elapsed){
 void entity::render(sf::RenderWindow &window) {
     window.draw(m_Circle);
     window.draw(m_FieldOfView);
+    if (m_IsSelected) {
+        sf::CircleShape circle;
+        circle.setRadius(m_Circle.getRadius() + 2);
+        circle.setOrigin(circle.getRadius(), circle.getRadius());
+        circle.setPosition(m_Circle.getPosition());
+        circle.setFillColor(sf::Color::Transparent);
+        circle.setOutlineColor(sf::Color::Red);
+        circle.setOutlineThickness(2);
+        window.draw(circle);
+    }
 }
 
 //! \brief Défini la position du champ de vision
@@ -137,8 +142,8 @@ void entity::initAttributes() {
 
 bool entity::checkPositionIsInside(int x, int y) {
     // calcule la position du centre de l'entité
-    int x_centre = m_Circle.getPosition().x + m_Circle.getRadius();
-    int y_centre = m_Circle.getPosition().y + m_Circle.getRadius();
+    int x_centre = m_Circle.getPosition().x;
+    int y_centre = m_Circle.getPosition().y;
     int rayon = m_Circle.getRadius();
 
     int distance = sqrt(pow(x - x_centre, 2) + pow(y - y_centre, 2));
@@ -149,7 +154,48 @@ bool entity::checkPositionIsInside(int x, int y) {
 }
 
 std::string entity::getADN() {
-    return m_ADN;
+    // return l'ADN sous forme de chaine de caractère de 4 lettres (A, C, G, T) en fonction du caractère qui a le plus de fois dans l'ADN
+    std::string adn = "";
+    int nbA = 0;
+    int nbC = 0;
+    int nbG = 0;
+    int nbT = 0;
+    for (int i = 0; i < m_ADN.length(); i++) {
+        if (m_ADN[i] == 'A') {
+            nbA++;
+        } else if (m_ADN[i] == 'C') {
+            nbC++;
+        } else if (m_ADN[i] == 'G') {
+            nbG++;
+        } else if (m_ADN[i] == 'T') {
+            nbT++;
+        }
+    }
+    // détermine le caractère qui a le plus de fois dans l'ADN
+    int max = nbA;
+    if (nbC > max) {
+        max = nbC;
+    }
+    if (nbG > max) {
+        max = nbG;
+    }
+    if (nbT > max) {
+        max = nbT;
+    }
+    // ajoute les caractères qui ont le plus de fois dans l'ADN
+    if (nbA == max) {
+        adn += "A";
+    }
+    if (nbC == max) {
+        adn += "C";
+    }
+    if (nbG == max) {
+        adn += "G";
+    }
+    if (nbT == max) {
+        adn += "T";
+    }
+    return adn;
 }
 
 int entity::getLife() {
@@ -162,4 +208,16 @@ int entity::getEnergy() {
 
 int entity::getSpeed() {
     return m_Speed;
+}
+
+sf::Vector2f entity::getPosition() {
+    return m_Circle.getPosition();
+}
+
+int entity::getRadius() {
+    return m_Circle.getRadius();
+}
+
+void entity::isSelected(bool isSelected) {
+    m_IsSelected = isSelected;
 }

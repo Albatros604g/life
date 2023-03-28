@@ -9,6 +9,7 @@
 #include <list>
 #include "friendly.h"
 #include "hostil.h"
+#include "guiEntity.h"
 
 class core {
 public:
@@ -40,6 +41,11 @@ private:
     // entité sélectionnée
     entity *m_SelectedEntity;
     bool m_IsEntitySelected;
+    bool m_IsViewDragged;
+
+    sf::Vector2f m_MousePosDragged;
+
+    guiEntity m_GuiEntity;
 };
 
 

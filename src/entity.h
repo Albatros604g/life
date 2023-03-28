@@ -22,6 +22,7 @@ public:
 
     void update(sf::Time elapsed);
     void render(sf::RenderWindow &window);
+    void isSelected(bool isSelected);
 
     bool checkPositionIsInside(int x, int y);
 
@@ -31,6 +32,9 @@ public:
     int getSpeed();
 
     sf::CircleShape getCircle();
+
+    sf::Vector2f getPosition();
+    int getRadius();
 
 protected:
     sf::CircleShape m_Circle;
@@ -55,7 +59,7 @@ private:
     sf::Time m_TimeBeforeDeath;
     sf::Time m_TimeBeforeReproduction;
 
-
+    bool m_IsSelected;
 };
 
 

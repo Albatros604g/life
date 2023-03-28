@@ -17,5 +17,5 @@ friendly::~friendly() {
 void friendly::update(sf::Time elapsed) {
     entity::update(elapsed);
     // ou tourne sur lui même
-    //rotate(1);
+    rotate(-1);
 }

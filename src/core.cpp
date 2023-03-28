@@ -38,8 +38,8 @@ void core::initWindow() {
     // récurer la taille de l'écran
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
-    //m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Titlebar);
-    m_Window.create(sf::VideoMode( 800, 600), "Life", sf::Style::Close | sf::Style::Titlebar);
+    m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Titlebar);
+    //m_Window.create(sf::VideoMode( 800, 600), "Life", sf::Style::Close | sf::Style::Titlebar);
 
     m_Window.setFramerateLimit(60);
     m_View = m_Window.getDefaultView();
@@ -50,6 +50,13 @@ void core::initWindow() {
 void core::pollEvents() {
     sf::Event event;
     while (m_Window.pollEvent(event)) {
+        // récupère la position de la souris
+        sf::Vector2i mousePos = sf::Mouse::getPosition(m_Window);
+        // converti les coordonnées de la souris en coordonnées de la vue
+        sf::Vector2f mousePosView = m_Window.mapPixelToCoords(mousePos);
+        // récupère la position de la vue
+        sf::Vector2f viewPos = m_View.getCenter();
+
         if (event.type == sf::Event::Closed) {
             m_Window.close();
         }
@@ -81,7 +88,15 @@ void core::pollEvents() {
             // zoom la vue si la molette de la souris est utilisée
             if (event.mouseWheelScroll.delta > 0) {
                 m_View.zoom(0.9);
+                // calcule la différence entre la position de la souris et la position de la vue
+                sf::Vector2f delta = mousePosView - viewPos;
+                // divise le delta par 10
+                delta.x /= 10;
+                delta.y /= 10;
+                // déplace la vue
+                m_View.move(delta);
                 m_Window.setView(m_View);
+
             } else {
                 m_View.zoom(1.1);
                 m_Window.setView(m_View);
@@ -91,31 +106,56 @@ void core::pollEvents() {
         if (event.type == sf::Event::MouseButtonPressed) {
             // test si on clique sur le bouton gauche de la souris
             if (event.mouseButton.button == sf::Mouse::Left) {
-                // converti les coordonnées de la souris en coordonnées de la vue
-                sf::Vector2f mousePos = m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
-
                 m_IsEntitySelected = false;
                 // test si on clique sur une entité amicale
-                for (auto &entity : m_FriendlyEntities) {
-                    if (entity.checkPositionIsInside(mousePos.x, mousePos.y)) {
+                for (auto &entity: m_FriendlyEntities) {
+                    entity.isSelected(false);
+                    if (entity.checkPositionIsInside(mousePosView.x, mousePosView.y)) {
                         std::cout << "click on friendly" << std::endl;
                         m_SelectedEntity = &entity;
                         m_IsEntitySelected = true;
+                        entity.isSelected(true);
                     }
                 }
-                for (auto &entity : m_HostilesEntities) {
-                    if (entity.checkPositionIsInside(mousePos.x, mousePos.y)) {
+                for (auto &entity: m_HostilesEntities) {
+                    entity.isSelected(false);
+                    if (entity.checkPositionIsInside(mousePosView.x, mousePosView.y)) {
                         std::cout << "click on hostil" << std::endl;
                         m_SelectedEntity = &entity;
                         m_IsEntitySelected = true;
+                        entity.isSelected(true);
                     }
+                }
+            }
+            if (event.mouseButton.button == sf::Mouse::Right) {
+                // test si m_IsViewDragged est vrai
+                if (!m_IsViewDragged) {
+                    // Aggripe la vue a cette position
+                    m_IsViewDragged = true;
+                    m_MousePosDragged = mousePosView;
                 }
             }
         }
     }
+    // si il n'y a pas de clic droit
+    if (!sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+        // déaggripe la vue
+        m_IsViewDragged = false;
+    }
 }
 
 void core::update(sf::Time elapsed) {
+    // si la vue est agrippée
+    if (m_IsViewDragged) {
+        // calcule la différence entre la position de la souris actuelle et la position de la souris quand la vue a été agrippée m_MousePos
+        sf::Vector2f delta = m_MousePosDragged - m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
+        std::cout << delta.x << " " << delta.y << std::endl;
+        // déplace la vue
+        m_View.move(delta);
+        m_Window.setView(m_View);
+
+    }
+
     // parcours la liste des entités hostiles
     for (auto &entity : m_HostilesEntities) {
         entity.update(elapsed);
@@ -128,11 +168,14 @@ void core::update(sf::Time elapsed) {
     }
 
     if (m_IsEntitySelected) {
-        std::string adn = m_SelectedEntity->getADN();
-        int life = m_SelectedEntity->getLife();
-        int energy = m_SelectedEntity->getEnergy();
-        int speed = m_SelectedEntity->getSpeed();
-        std::cout << "ADN: " << adn << " life: " << life << " energy: " << energy << " speed: " << speed << std::endl;
+        m_GuiEntity.setADNText(m_SelectedEntity->getADN());
+        m_GuiEntity.setLifeText(m_SelectedEntity->getLife());
+        m_GuiEntity.setEnergyText(m_SelectedEntity->getEnergy());
+        m_GuiEntity.setSpeedText(m_SelectedEntity->getSpeed());
+        sf::Vector2f pos = m_SelectedEntity->getPosition();
+        pos.x += m_SelectedEntity->getRadius() - 50;
+        pos.y += m_SelectedEntity->getRadius() + 20;
+        m_GuiEntity.setPos(pos);
     }
 
 /*
@@ -171,4 +214,7 @@ void core::render() {
         entity.render(m_Window);
     }
 
+    if (m_IsEntitySelected) {
+        m_GuiEntity.render(m_Window);
+    }
 }

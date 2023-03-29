@@ -55,7 +55,7 @@ void entity::setPos(float x, float y) {
 }
 
 //! \brief Tourne l'entité
-void entity::rotate(int angle) {
+void entity::rotate(float angle) {
     m_Circle.rotate(angle);
     m_FieldOfView.rotate(angle);
 

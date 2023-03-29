@@ -12,7 +12,7 @@ set(SFML_DIR "C:\\SFML-64\\lib\\cmake\\SFML")
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};C:\\SFML-64\\cmake\\SFML")
 
 
-add_executable(life src/main.cpp src/core.cpp src/core.h src/entity.cpp src/entity.h src/friendly.cpp src/friendly.h src/hostil.cpp src/hostil.h src/guiEntity.cpp src/guiEntity.h)
+add_executable(life src/main.cpp src/core.cpp src/core.h src/entity.cpp src/entity.h src/friendly.cpp src/friendly.h src/hostil.cpp src/hostil.h src/guiEntity.cpp src/guiEntity.h src/guiMenu.cpp src/guiMenu.h src/guiMenu.h)
 
 # Trouvez les bibliothèques SFML nécessaires pour le projet
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)

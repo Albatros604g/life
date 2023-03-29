@@ -5,7 +5,7 @@
 #include "guiEntity.h"
 
 guiEntity::guiEntity() {
-    m_Font.loadFromFile("C:\\Users\\admin\\CLionProjects\\life\\assets\\font\\Oswald-Medium.ttf");
+    m_Font.loadFromFile("C:\\Users\\rufiala\\CLionProjects\\life\\assets\\font\\Oswald-Medium.ttf");
 
     m_ADNText.setFont(m_Font);
     m_LifeText.setFont(m_Font);

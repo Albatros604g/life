@@ -16,6 +16,7 @@ core::core() {
     m_FriendlyEntities.push_back(m_Friendly);
 
     m_IsEntitySelected = false;
+    m_IsAddEntity = false;
 }
 
 core::~core() {
@@ -38,7 +39,7 @@ void core::initWindow() {
     // récurer la taille de l'écran
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
-    m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Titlebar);
+    m_Window.create(sf::VideoMode( desktop.width, desktop.height), "Life", sf::Style::Close | sf::Style::Resize);
     //m_Window.create(sf::VideoMode( 800, 600), "Life", sf::Style::Close | sf::Style::Titlebar);
 
     m_Window.setFramerateLimit(60);
@@ -82,6 +83,12 @@ void core::pollEvents() {
                 m_View.move(10, 0);
                 m_Window.setView(m_View);
             }
+            // si on appuie sur delete on supprime l'entité sélectionnée
+            if (event.key.code == sf::Keyboard::Delete) {
+                if (m_IsEntitySelected) {
+
+                }
+            }
         }
 
         if (event.type == sf::Event::MouseWheelScrolled) {
@@ -107,6 +114,7 @@ void core::pollEvents() {
             // test si on clique sur le bouton gauche de la souris
             if (event.mouseButton.button == sf::Mouse::Left) {
                 m_IsEntitySelected = false;
+                m_IsAddEntity = true;
                 // test si on clique sur une entité amicale
                 for (auto &entity: m_FriendlyEntities) {
                     entity.isSelected(false);
@@ -115,6 +123,7 @@ void core::pollEvents() {
                         m_SelectedEntity = &entity;
                         m_IsEntitySelected = true;
                         entity.isSelected(true);
+                        m_IsAddEntity = false;
                     }
                 }
                 for (auto &entity: m_HostilesEntities) {
@@ -124,8 +133,32 @@ void core::pollEvents() {
                         m_SelectedEntity = &entity;
                         m_IsEntitySelected = true;
                         entity.isSelected(true);
+                        m_IsAddEntity = false;
                     }
                 }
+
+                if (m_GuiMenu.checkPositionIsInside(mousePos.x, mousePos.y)) {
+                    std::cout << "click on menu" << std::endl;
+                    m_IsAddEntity = false;
+                }
+
+                if (m_IsAddEntity) {
+                    if (m_GuiMenu.getCircleFIsSelected()) {
+                        // ajoute une entité amicale
+                        friendly friendly;
+                        friendly.setPos(mousePosView.x, mousePosView.y);
+                        m_FriendlyEntities.push_back(friendly);
+                    }
+
+                    if (m_GuiMenu.getCircleHIsSelected()) {
+                        // ajoute une entité hostile
+                        hostil hostil;
+                        hostil.setPos(mousePosView.x, mousePosView.y);
+                        m_HostilesEntities.push_back(hostil);
+                    }
+                }
+
+
             }
             if (event.mouseButton.button == sf::Mouse::Right) {
                 // test si m_IsViewDragged est vrai
@@ -149,7 +182,6 @@ void core::update(sf::Time elapsed) {
     if (m_IsViewDragged) {
         // calcule la différence entre la position de la souris actuelle et la position de la souris quand la vue a été agrippée m_MousePos
         sf::Vector2f delta = m_MousePosDragged - m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
-        std::cout << delta.x << " " << delta.y << std::endl;
         // déplace la vue
         m_View.move(delta);
         m_Window.setView(m_View);
@@ -217,4 +249,6 @@ void core::render() {
     if (m_IsEntitySelected) {
         m_GuiEntity.render(m_Window);
     }
+
+    m_GuiMenu.render(m_Window);
 }

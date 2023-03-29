@@ -10,6 +10,7 @@
 #include "friendly.h"
 #include "hostil.h"
 #include "guiEntity.h"
+#include "guiMenu.h"
 
 class core {
 public:
@@ -42,10 +43,12 @@ private:
     entity *m_SelectedEntity;
     bool m_IsEntitySelected;
     bool m_IsViewDragged;
+    bool m_IsAddEntity;
 
     sf::Vector2f m_MousePosDragged;
 
     guiEntity m_GuiEntity;
+    guiMenu m_GuiMenu;
 };
 
 

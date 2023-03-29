@@ -40,7 +40,7 @@ protected:
     sf::CircleShape m_Circle;
     sf::ConvexShape m_FieldOfView;
 
-    void rotate(int angle);
+    void rotate(float angle);
     void move(int x, int y);
 
     void setPositionFieldView();

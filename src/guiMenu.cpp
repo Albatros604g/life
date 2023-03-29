@@ -10,7 +10,7 @@ guiMenu::guiMenu() {
     m_Font.loadFromFile("C:\\Users\\rufiala\\CLionProjects\\life\\assets\\font\\Oswald-Medium.ttf");
 
     m_Text.setFont(m_Font);
-    m_Text.setCharacterSize(50);
+    m_Text.setCharacterSize(20);
     m_Text.setFillColor(sf::Color::White);
     m_Text.setPosition(0, 0);
     m_Text.setString("Menu");
@@ -37,7 +37,7 @@ guiMenu::guiMenu() {
 
     m_BackgroundRemoveEntity.setSize(sf::Vector2f(200, 50));
     // couleur de fond mauve futuriste
-    m_BackgroundRemoveEntity.setFillColor(sf::Color(255, 0, 255, 0));
+    m_BackgroundRemoveEntity.setFillColor(sf::Color(255, 0, 255, 100));
 
     m_CircleFIsSelected = false;
     m_CircleHIsSelected = false;
@@ -73,10 +73,10 @@ void guiMenu::render(sf::RenderWindow &window) {
     m_Background.setSize(sf::Vector2f(m_ViewMenu.getSize().x, percent * 16));
 
     // positionne le texte dans le rectangle
-    m_Text.setPosition(m_ViewMenu.getSize().x / 2 - m_Text.getGlobalBounds().width / 2, m_ViewMenu.getSize().y - percent * 20 + percent * 2);
+    m_Text.setPosition(m_ViewMenu.getSize().x / 2 - m_Text.getGlobalBounds().width / 2, m_ViewMenu.getSize().y - percent * 20 );
 
     // la taille du texte est égale à 20% de la hauteur de la fenêtre
-    m_Text.setCharacterSize(percent * 8);
+    m_Text.setCharacterSize(percent * 3);
 
     // positionne le cercle f a gauche du rectangle de fond
     m_CircleF.setPosition((m_Background.getPosition().x + percent * 6) + m_CircleH.getRadius(), m_Background.getPosition().y + percent * 5);
@@ -84,12 +84,27 @@ void guiMenu::render(sf::RenderWindow &window) {
     // positionne le cercle h a droite du rectangle de fond mais a l'opposé
     m_CircleH.setPosition((m_Background.getPosition().x + m_Background.getSize().x - percent * 6) - m_CircleH.getRadius(), m_Background.getPosition().y + percent * 5);
 
+    // positionne le rectangle de fond du bouton remove au millieu
+    m_BackgroundRemoveEntity.setPosition(m_ViewMenu.getSize().x / 2 - m_BackgroundRemoveEntity.getSize().x / 2, m_ViewMenu.getSize().y - percent * 20 + percent * 4);
+
+    // positionne le texte du bouton remove dans le rectangle de fond
+    m_TextRemoveEntity.setPosition(m_BackgroundRemoveEntity.getPosition().x + m_BackgroundRemoveEntity.getSize().x / 2 - m_TextRemoveEntity.getGlobalBounds().width / 2, m_BackgroundRemoveEntity.getPosition().y - 4);
+
+    // si m_RemoveEntityIsSelected est vrai alors le texte du bouton remove est rouge
+    if (m_RemoveEntityIsSelected) {
+        m_TextRemoveEntity.setFillColor(sf::Color::Red);
+    } else {
+        m_TextRemoveEntity.setFillColor(sf::Color::White);
+    }
+
     // applique la vue
     window.setView(m_ViewMenu);
     window.draw(m_Background);
     window.draw(m_Text);
     window.draw(m_CircleF);
     window.draw(m_CircleH);
+    window.draw(m_BackgroundRemoveEntity);
+    window.draw(m_TextRemoveEntity);
 
     // dessine un contour autour du cercle f si il est sélectionné
     if (m_CircleFIsSelected) {
@@ -111,6 +126,19 @@ void guiMenu::render(sf::RenderWindow &window) {
         circleHSelected.setOutlineThickness(2);
         circleHSelected.setPosition(m_CircleH.getPosition().x - circleHSelected.getRadius(), m_CircleH.getPosition().y - circleHSelected.getRadius());
         window.draw(circleHSelected);
+    }
+
+    // si m_RemoveEntityIsSelected est vrai alors on fais un contour autour du bouton remove
+    if (m_RemoveEntityIsSelected) {
+        m_TextRemoveEntity.setFillColor(sf::Color::Red);
+        // dessine un contour autour du bouton remove
+        sf::RectangleShape rectSelected;
+        rectSelected.setSize(sf::Vector2f(m_BackgroundRemoveEntity.getSize().x + 4, m_BackgroundRemoveEntity.getSize().y + 4));
+        rectSelected.setFillColor(sf::Color::Transparent);
+        rectSelected.setOutlineColor(sf::Color::White);
+        rectSelected.setOutlineThickness(2);
+        rectSelected.setPosition(m_BackgroundRemoveEntity.getPosition().x - 2, m_BackgroundRemoveEntity.getPosition().y - 2);
+        window.draw(rectSelected);
     }
 
     // réinitialise la vue
@@ -143,6 +171,7 @@ bool guiMenu::checkPositionIsInside(int x, int y) {
         result = true;
         m_CircleFIsSelected = !m_CircleFIsSelected;
         m_CircleHIsSelected = false;
+        m_RemoveEntityIsSelected = false;
     } else {
         result = false;
     }
@@ -157,6 +186,7 @@ bool guiMenu::checkPositionIsInside(int x, int y) {
             result = true;
             m_CircleHIsSelected = !m_CircleHIsSelected;
             m_CircleFIsSelected = false;
+            m_RemoveEntityIsSelected = false;
         } else {
             result = false;
         }
@@ -167,7 +197,9 @@ bool guiMenu::checkPositionIsInside(int x, int y) {
         if (x >= m_BackgroundRemoveEntity.getPosition().x && x <= m_BackgroundRemoveEntity.getPosition().x + m_BackgroundRemoveEntity.getSize().x) {
             if (y >= m_BackgroundRemoveEntity.getPosition().y && y <= m_BackgroundRemoveEntity.getPosition().y + m_BackgroundRemoveEntity.getSize().y) {
                 result = true;
-                m_RemoveEntityIsSelected = true;
+                m_RemoveEntityIsSelected = !m_RemoveEntityIsSelected;
+                m_CircleFIsSelected = false;
+                m_CircleHIsSelected = false;
             }
         }
     }

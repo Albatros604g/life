@@ -208,6 +208,7 @@ void core::update(sf::Time elapsed) {
 
     if (m_IsEntitySelected) {
         if (m_IsRemoveEntity) {
+            m_IsRemoveEntity = false;
             // Boucle sur la liste des entités sélectionnées
             for (auto &entity : m_SelectedEntities) {
                 // si l'entité est amicale
@@ -262,7 +263,6 @@ void core::update(sf::Time elapsed) {
         m_CircleHostile.setFillColor(sf::Color::Red);
     }
 */
-
 }
 
 void core::render() {

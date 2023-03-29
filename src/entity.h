@@ -14,6 +14,12 @@
 
 class entity {
 public:
+    // enum pour les types d'entités
+    enum Type {
+        Friendly,
+        Hostil,
+        Neutral
+    };
     entity();
     ~entity();
 
@@ -23,6 +29,8 @@ public:
     void update(sf::Time elapsed);
     void render(sf::RenderWindow &window);
     void isSelected(bool isSelected);
+
+    bool getIsSelected() const;
 
     bool checkPositionIsInside(int x, int y);
 
@@ -36,6 +44,8 @@ public:
     sf::Vector2f getPosition();
     int getRadius();
 
+    Type getType();
+
 protected:
     sf::CircleShape m_Circle;
     sf::ConvexShape m_FieldOfView;
@@ -44,6 +54,8 @@ protected:
     void move(int x, int y);
 
     void setPositionFieldView();
+    void setHostil();
+    void setFriendly();
 
 private:
     void initADN();
@@ -60,6 +72,8 @@ private:
     sf::Time m_TimeBeforeReproduction;
 
     bool m_IsSelected;
+
+    Type m_Type;
 };
 
 

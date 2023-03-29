@@ -7,7 +7,7 @@
 #include "hostil.h"
 
 hostil::hostil() {
-    m_Circle.setFillColor(sf::Color::Red);
+    setHostil();
 }
 
 hostil::~hostil() {

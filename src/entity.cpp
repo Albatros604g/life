@@ -27,6 +27,9 @@ entity::entity() {
 
     isSelected(false);
 
+    // set le type de l'entité à neutre
+    m_Type = Neutral;
+
     setPositionFieldView();
     initADN();
     initAttributes();
@@ -40,6 +43,26 @@ entity::~entity() {
 //! \brief Retourne le cercle de l'entité
 sf::CircleShape entity::getCircle() {
     return m_Circle;
+}
+
+void entity::setFriendly() {
+    m_Type = Friendly;
+    m_Circle.setFillColor(sf::Color::Green);
+}
+
+void entity::setHostil() {
+    m_Type = Hostil;
+    m_Circle.setFillColor(sf::Color::Red);
+}
+
+//! \brief Retourne le type de l'entité
+entity::Type entity::getType() {
+    return m_Type;
+}
+
+//! \brief Retourne si l'entité est sélectionnée
+bool entity::getIsSelected() const {
+    return m_IsSelected;
 }
 
 //! \brief Défini la position de l'entité

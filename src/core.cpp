@@ -86,7 +86,27 @@ void core::pollEvents() {
             // si on appuie sur delete on supprime l'entité sélectionnée
             if (event.key.code == sf::Keyboard::Delete) {
                 if (m_IsEntitySelected) {
-
+                    if (m_SelectedEntity->getType() == entity::Type::Friendly) {
+                        // parcours la liste des entités amicales
+                        for (auto it = m_FriendlyEntities.begin(); it != m_FriendlyEntities.end(); it++) {
+                            // si l'entité est sélectionnée on la supprime
+                            if (it->getIsSelected()) {
+                                m_FriendlyEntities.erase(it);
+                                m_IsEntitySelected = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        // parcours la liste des entités hostiles
+                        for (auto it = m_HostilesEntities.begin(); it != m_HostilesEntities.end(); it++) {
+                            // si l'entité est sélectionnée on la supprime
+                            if (it->getIsSelected()) {
+                                m_HostilesEntities.erase(it);
+                                m_IsEntitySelected = false;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }

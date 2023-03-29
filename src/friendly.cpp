@@ -7,7 +7,7 @@
 #include "friendly.h"
 
 friendly::friendly() {
-    m_Circle.setFillColor(sf::Color::Green);
+    setFriendly();
 }
 
 friendly::~friendly() {

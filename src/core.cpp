@@ -85,29 +85,7 @@ void core::pollEvents() {
             }
             // si on appuie sur delete on supprime l'entité sélectionnée
             if (event.key.code == sf::Keyboard::Delete) {
-                if (m_IsEntitySelected) {
-                    if (m_SelectedEntity->getType() == entity::Type::Friendly) {
-                        // parcours la liste des entités amicales
-                        for (auto it = m_FriendlyEntities.begin(); it != m_FriendlyEntities.end(); it++) {
-                            // si l'entité est sélectionnée on la supprime
-                            if (it->getIsSelected()) {
-                                m_FriendlyEntities.erase(it);
-                                m_IsEntitySelected = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        // parcours la liste des entités hostiles
-                        for (auto it = m_HostilesEntities.begin(); it != m_HostilesEntities.end(); it++) {
-                            // si l'entité est sélectionnée on la supprime
-                            if (it->getIsSelected()) {
-                                m_HostilesEntities.erase(it);
-                                m_IsEntitySelected = false;
-                                break;
-                            }
-                        }
-                    }
-                }
+                m_IsRemoveEntity = true;
             }
         }
 
@@ -144,6 +122,8 @@ void core::pollEvents() {
                         m_IsEntitySelected = true;
                         entity.isSelected(true);
                         m_IsAddEntity = false;
+                        // ajoute l'entité à la liste des entités sélectionnées
+                        m_SelectedEntities.push_back(&entity);
                     }
                 }
                 for (auto &entity: m_HostilesEntities) {
@@ -154,6 +134,8 @@ void core::pollEvents() {
                         m_IsEntitySelected = true;
                         entity.isSelected(true);
                         m_IsAddEntity = false;
+                        // ajoute l'entité à la liste des entités sélectionnées
+                        m_SelectedEntities.push_back(&entity);
                     }
                 }
 
@@ -176,6 +158,10 @@ void core::pollEvents() {
                         hostil.setPos(mousePosView.x, mousePosView.y);
                         m_HostilesEntities.push_back(hostil);
                     }
+                }
+
+                if (m_GuiMenu.getRemoveEntityIsSelected()) {
+                    m_IsRemoveEntity = true;
                 }
 
 
@@ -219,15 +205,44 @@ void core::update(sf::Time elapsed) {
         entity.update(elapsed);
     }
 
+
     if (m_IsEntitySelected) {
-        m_GuiEntity.setADNText(m_SelectedEntity->getADN());
-        m_GuiEntity.setLifeText(m_SelectedEntity->getLife());
-        m_GuiEntity.setEnergyText(m_SelectedEntity->getEnergy());
-        m_GuiEntity.setSpeedText(m_SelectedEntity->getSpeed());
-        sf::Vector2f pos = m_SelectedEntity->getPosition();
-        pos.x += m_SelectedEntity->getRadius() - 50;
-        pos.y += m_SelectedEntity->getRadius() + 20;
-        m_GuiEntity.setPos(pos);
+        if (m_IsRemoveEntity) {
+            // Boucle sur la liste des entités sélectionnées
+            for (auto &entity : m_SelectedEntities) {
+                // si l'entité est amicale
+                if (entity->getType() == entity::Type::Friendly) {
+                    // parcours la liste des entités amicales
+                    for (auto it = m_FriendlyEntities.begin(); it != m_FriendlyEntities.end(); it++) {
+                        // si l'entité est sélectionnée on la supprime
+                        if (it->getIsSelected()) {
+                            m_FriendlyEntities.erase(it);
+                            m_IsEntitySelected = false;
+                            break;
+                        }
+                    }
+                } else {
+                    // parcours la liste des entités hostiles
+                    for (auto it = m_HostilesEntities.begin(); it != m_HostilesEntities.end(); it++) {
+                        // si l'entité est sélectionnée on la supprime
+                        if (it->getIsSelected()) {
+                            m_HostilesEntities.erase(it);
+                            m_IsEntitySelected = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            m_GuiEntity.setADNText(m_SelectedEntity->getADN());
+            m_GuiEntity.setLifeText(m_SelectedEntity->getLife());
+            m_GuiEntity.setEnergyText(m_SelectedEntity->getEnergy());
+            m_GuiEntity.setSpeedText(m_SelectedEntity->getSpeed());
+            sf::Vector2f pos = m_SelectedEntity->getPosition();
+            pos.x += m_SelectedEntity->getRadius() - 50;
+            pos.y += m_SelectedEntity->getRadius() + 20;
+            m_GuiEntity.setPos(pos);
+        }
     }
 
 /*
@@ -270,5 +285,6 @@ void core::render() {
         m_GuiEntity.render(m_Window);
     }
 
+    m_IsRemoveEntity = false;
     m_GuiMenu.render(m_Window);
 }

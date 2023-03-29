@@ -41,9 +41,13 @@ private:
 
     // entité sélectionnée
     entity *m_SelectedEntity;
+    // Liste des entités sélectionnées
+    std::list<entity*> m_SelectedEntities;
+
     bool m_IsEntitySelected;
     bool m_IsViewDragged;
     bool m_IsAddEntity;
+    bool m_IsRemoveEntity;
 
     sf::Vector2f m_MousePosDragged;
 

@@ -29,6 +29,16 @@ guiMenu::guiMenu() {
     m_CircleH.setPosition(0, 0);
     m_CircleH.setOrigin(m_CircleH.getRadius(), m_CircleH.getRadius());
 
+    m_TextRemoveEntity.setFont(m_Font);
+    m_TextRemoveEntity.setCharacterSize(50);
+    m_TextRemoveEntity.setFillColor(sf::Color::White);
+    m_TextRemoveEntity.setPosition(0, 0);
+    m_TextRemoveEntity.setString("Remove");
+
+    m_BackgroundRemoveEntity.setSize(sf::Vector2f(200, 50));
+    // couleur de fond mauve futuriste
+    m_BackgroundRemoveEntity.setFillColor(sf::Color(255, 0, 255, 0));
+
     m_CircleFIsSelected = false;
     m_CircleHIsSelected = false;
 }
@@ -115,6 +125,10 @@ bool guiMenu::getCircleHIsSelected() {
     return m_CircleHIsSelected;
 }
 
+bool guiMenu::getRemoveEntityIsSelected() {
+    return m_RemoveEntityIsSelected;
+}
+
 bool guiMenu::checkPositionIsInside(int x, int y) {
     bool result = false;
 
@@ -147,6 +161,17 @@ bool guiMenu::checkPositionIsInside(int x, int y) {
             result = false;
         }
     }
+
+    if (!result) {
+        // test si la position est dans le rectangle du bouton m_BackgroundRemoveEntity
+        if (x >= m_BackgroundRemoveEntity.getPosition().x && x <= m_BackgroundRemoveEntity.getPosition().x + m_BackgroundRemoveEntity.getSize().x) {
+            if (y >= m_BackgroundRemoveEntity.getPosition().y && y <= m_BackgroundRemoveEntity.getPosition().y + m_BackgroundRemoveEntity.getSize().y) {
+                result = true;
+                m_RemoveEntityIsSelected = true;
+            }
+        }
+    }
+
     return result;
 }
 

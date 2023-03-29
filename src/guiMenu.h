@@ -23,22 +23,28 @@ public:
 
     bool getCircleFIsSelected();
     bool getCircleHIsSelected();
+    bool getRemoveEntityIsSelected();
 
 private:
     sf::Font m_Font;
 
     sf::Text m_Text;
+    sf::Text m_TextRemoveEntity;
 
     void setPos();
 
     // rectangle de fond du menu
     sf::RectangleShape m_Background;
 
+    // rectangle de fond pour le bouton remove entity
+    sf::RectangleShape m_BackgroundRemoveEntity;
+
     sf::CircleShape m_CircleF;
     sf::CircleShape m_CircleH;
 
     bool m_CircleFIsSelected;
     bool m_CircleHIsSelected;
+    bool m_RemoveEntityIsSelected;
 
     // créer un nouvel vu
     sf::View m_ViewMenu;
